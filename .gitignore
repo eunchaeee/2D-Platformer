@@ -73,3 +73,6 @@ crashlytics-build.properties
 
 /WebGL Builds
 *.zip
+
+# IDE Settings
+.idea/
