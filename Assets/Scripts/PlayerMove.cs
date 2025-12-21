@@ -7,16 +7,26 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private float moveSpeed = 6f;
 
     private float inputX;
-    
+    private bool isFinished;
 
     void Update()
     {
+        if (isFinished) return;
         inputX = Input.GetAxisRaw("Horizontal");
-        Debug.Log(inputX);
     }
 
     private void FixedUpdate()
     {
+        if (isFinished)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
         rb.linearVelocity = new Vector2(inputX * moveSpeed, rb.linearVelocity.y);
+    }
+
+    public void Finish()
+    {
+        isFinished = true;
     }
 }
