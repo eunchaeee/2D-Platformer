@@ -6,68 +6,42 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float moveSpeed = 6f;
 
-    private float inputX;
-    private float inputY;
-    private bool isFinished;
+    private float horizontal;
+    private bool endGame;
 
-    [SerializeField] private bool isOnLadder;
+    
+    // status
+    private PlayerLadder playerLadder;
+    private bool isGrounded;
+
+    private void Start()
+    {
+        playerLadder = GetComponent<PlayerLadder>();
+    }
 
     void Update()
     {
-        if (isFinished) return;
+        if (endGame) return;
         
-        inputX = Input.GetAxisRaw("Horizontal");
-        inputY = Input.GetAxisRaw("Vertical");
-
-        Debug.Log($"{inputX}, {inputY}");
-
-        
+        horizontal = Input.GetAxisRaw("Horizontal");
     }
 
     private void FixedUpdate()
     {
-        if (isFinished)
+        if (endGame)
         {
             rb.linearVelocity = Vector2.zero;
             return;
         }
 
-        if (isOnLadder && inputY != 0)
-        {
-            rb.gravityScale = 0f;
-            rb.MovePosition(new Vector2(rb.position.x, rb.position.y + inputY * moveSpeed * Time.fixedDeltaTime));
+        if (playerLadder != null && playerLadder.IsClimbing)
             return;
-        }
-
-        rb.linearVelocity = new Vector2(inputX * moveSpeed, rb.linearVelocity.y);
+        
+        rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
     }
 
     public void Finish()
     {
-        isFinished = true;
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.name == "ladder")
-        {
-            isOnLadder = true;
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.gameObject.name == "ladder")
-        {
-            isOnLadder = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.name == "ladder")
-        {
-            isOnLadder = false;
-        }
+        endGame = true;
     }
 }
