@@ -8,7 +8,8 @@ public class PlayerMove : MonoBehaviour
     //speed
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private float climbSpeed = 5f;
-
+    [SerializeField] private float jumpPower = 70f;
+    
     //ground check
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.1f;
@@ -26,6 +27,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private bool isGrounded;
     [SerializeField] private bool isNearLadder;
     [SerializeField] private bool isClimbing;
+    [SerializeField] private bool isJump;
 
     //ladder
     private Ladder ladder;
@@ -55,6 +57,11 @@ public class PlayerMove : MonoBehaviour
             isClimbing = true;
         else if (isClimbing && isGrounded)
             isClimbing = false;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isJump = true;
+        }
     }
 
     private void FixedUpdate()
@@ -67,6 +74,13 @@ public class PlayerMove : MonoBehaviour
 
         // judge isGrounded
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
+        
+        // jump
+        if (isJump && isGrounded && !isClimbing)
+        {
+            Jump();
+            isJump = false;
+        }
         
         // Player Move (Climb / not Climb)
         if (isClimbing)
@@ -82,6 +96,12 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    private void Jump()
+    {
+        //rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+    }
+    
     public void Finish()
     {
         endGame = true;
