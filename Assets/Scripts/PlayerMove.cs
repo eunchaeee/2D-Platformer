@@ -14,7 +14,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.1f;
     [SerializeField] private LayerMask groundLayer;
-
+    
     // rigid body setting
     private float gravityScale;
     
@@ -46,6 +46,10 @@ public class PlayerMove : MonoBehaviour
         horizontal = Input.GetAxisRaw("Horizontal");        
         vertical = Input.GetAxisRaw("Vertical");
 
+        // Facing Direction
+        if (horizontal != 0)
+            transform.localScale = new Vector3(Mathf.Sign(horizontal), 1, 1);
+        
         // gravity setting
         if (isNearLadder)
             rb.gravityScale = 0;
