@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private bool isGrounded;
     [SerializeField] private bool isNearLadder;
     [SerializeField] private bool isClimbing;
-    [SerializeField] private bool isJump;
+    [SerializeField] private bool jumpRequest;
 
     //ladder
     private Ladder ladder;
@@ -62,9 +63,9 @@ public class PlayerMove : MonoBehaviour
         else if (isClimbing && isGrounded)
             isClimbing = false;
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isGrounded && !isClimbing && Input.GetKeyDown(KeyCode.Space))
         {
-            isJump = true;
+            jumpRequest = true;
         }
     }
 
@@ -76,15 +77,9 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
-        // judge isGrounded
+        // ground
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
         
-        // jump
-        if (isJump && isGrounded && !isClimbing)
-        {
-            Jump();
-            isJump = false;
-        }
         
         // Player Move (Climb / not Climb)
         if (isClimbing)
@@ -93,18 +88,27 @@ public class PlayerMove : MonoBehaviour
             float newY = Mathf.Clamp(rb.position.y + vertical * climbSpeed * Time.fixedDeltaTime, 
                 ladder.bottom.position.y, ladder.top.position.y);
             rb.MovePosition(new Vector2(newX, newY));
+            return;
         }
-        else
+        
+        // jump
+        if (jumpRequest)
         {
-            rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
+            Jump();
+            jumpRequest = false;
         }
+        
+        rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
+ 
     }
 
     private void Jump()
     {
-        //rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
     }
+    
+    
     
     public void Finish()
     {
